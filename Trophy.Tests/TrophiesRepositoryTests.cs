@@ -1,4 +1,5 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Linq;
 
 namespace Trophy.Tests
 {
@@ -12,6 +13,52 @@ namespace Trophy.Tests
         {
             repo = new TrophiesRepository();
         }
+        
+        [TestMethod]
+        public void Get_ShouldReturnAllTrophies_WhenNoFilterOrSort()
+        {
+            var trophies = repo.Get();
+
+            Assert.AreEqual(5, trophies.Count);
+        }
+        
+        [TestMethod]
+        public void Get_ShouldFilterByYear()
+        {
+            var trophies = repo.Get(filterYear: 2020);
+
+            Assert.AreEqual(1, trophies.Count);
+            Assert.AreEqual(2020, trophies[0].Year);
+        }
+
+        [TestMethod]
+        public void Get_ShouldSortByCompetition()
+        {
+            var trophies = repo.Get(sortBy: "Competition");
+
+            Assert.AreEqual(5, trophies.Count);
+            Assert.IsTrue(trophies.SequenceEqual(trophies.OrderBy(t => t.Competition)));
+        }
+
+        [TestMethod]
+        public void Get_ShouldSortByYear()
+        {
+            var trophies = repo.Get(sortBy: "Year");
+
+            Assert.AreEqual(5, trophies.Count);
+            Assert.IsTrue(trophies.SequenceEqual(trophies.OrderBy(t => t.Year)));
+        }
+
+        [TestMethod]
+        public void Get_ShouldFilterAndSort()
+        {
+            var trophies = repo.Get(filterYear: 2020, sortBy: "Competition");
+
+            Assert.AreEqual(1, trophies.Count);
+            Assert.AreEqual(2020, trophies[0].Year);
+            Assert.AreEqual("Champions League", trophies[0].Competition);
+        }
+        
 
         [TestMethod]
         public void Add_ShouldAssignIdAndAddTrophy()
